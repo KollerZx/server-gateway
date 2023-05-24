@@ -6,7 +6,7 @@ import { ConfigGateway } from '../@types'
 
 async function routes(fastify: FastifyInstance, opts: FastifyPluginOptions) {
   fastify.get("/", async (request, reply) => {
-    reply.send({ message: "Hello World!" })
+    reply.send({ message: "Hello World" })
   })
 
   fastify.post('/user/register', async (request, reply) => {
@@ -34,8 +34,8 @@ async function routes(fastify: FastifyInstance, opts: FastifyPluginOptions) {
   
   fastify.post("/config", { onRequest: fastify.authenticate }, async (request, reply) => {
     try {
-      const {serialPort, logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection} = request.body as ConfigGateway
-      const gateway = await Gateway.create({serialPort, logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection})
+      const {serialPort,description, logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection} = request.body as ConfigGateway
+      const gateway = await Gateway.create({serialPort, description ,logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection})
       reply.send(gateway)
     } catch (error: any) {
       reply.log.error(error)

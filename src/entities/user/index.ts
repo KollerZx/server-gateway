@@ -9,6 +9,9 @@ export class User{
   }
 
   static async create({username, password}: UserCreate){
+    if(!username || !password){
+      throw new Error('username e password são obrigatórios')
+    }
     const passwordHash = await hash(password, 10)
     const user = new User(username, passwordHash)
     const newUser = await prisma.user.create({
