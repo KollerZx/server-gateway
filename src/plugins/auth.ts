@@ -9,7 +9,7 @@ import { SECRET } from '../setup';
 
 async function authPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
   fastify
-    .register(jwt, { secret: SECRET})
+    .register(jwt, { secret: SECRET })
     .post('/login', (request, reply) => getToken(fastify, request, reply))
     .decorate("authenticate", ensureAuthentication)
 

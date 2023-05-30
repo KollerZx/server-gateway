@@ -3,6 +3,7 @@ import fp from 'fastify-plugin'
 import { User, UserCreate } from '../entities/user'
 import { Gateway } from '../entities/gateway'
 import { ConfigGateway } from '../@types'
+import { CreateConfigController } from '../controllers/gateway/CreateConfigController'
 
 async function routes(fastify: FastifyInstance, opts: FastifyPluginOptions) {
   fastify.get("/", async (request, reply) => {
@@ -11,54 +12,45 @@ async function routes(fastify: FastifyInstance, opts: FastifyPluginOptions) {
 
   fastify.post('/user/register', async (request, reply) => {
     try {
-      const {username, password} = request.body as UserCreate
-      const user = await User.create({username, password})
+      const { username, password } = request.body as UserCreate
+      const user = await User.create({ username, password })
       reply.status(201).send(user)
-    } catch (error:any) {
+    } catch (error: any) {
       reply.log.error(error)
-      reply.status(500).send({error: error?.message})
+      reply.status(500).send({ error: error?.message })
     }
   })
 
   fastify.put('/user/update/:id', async (request, reply) => {
     try {
-      const {id} = request.params as any
-      const {username, password} = request.body as UserCreate
-      const user = await User.update(Number(id), {username, password})
+      const { id } = request.params as any
+      const { username, password } = request.body as UserCreate
+      const user = await User.update(Number(id), { username, password })
       reply.status(201).send(user)
-    } catch (error:any) {
-      reply.log.error(error)
-      reply.status(500).send({error: error?.message})
-    }
-  })
-  
-  fastify.post("/config", { onRequest: fastify.authenticate }, async (request, reply) => {
-    try {
-      const {serialPort,description, logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection} = request.body as ConfigGateway
-      const gateway = await Gateway.create({serialPort, description ,logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection})
-      reply.send(gateway)
     } catch (error: any) {
       reply.log.error(error)
-      reply.status(500).send({error: error?.message})
+      reply.status(500).send({ error: error?.message })
     }
   })
+
+  fastify.post("/config", { onRequest: fastify.authenticate }, CreateConfigController)
 
   fastify.get("/config", { onRequest: fastify.authenticate }, async (request, reply) => {
     const configs = await Gateway.findAll()
-    reply.send(configs)
+    reply.send({ configs })
   })
 
-  fastify.put("/config/:id", { onRequest: fastify.authenticate,  }, async (request, reply) => {
+  fastify.put("/config/:id", { onRequest: fastify.authenticate, }, async (request, reply) => {
     try {
-    const {id} = request.params as any
-    const {serialPort, logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection} = request.body as Partial<ConfigGateway>
-    const config = await Gateway.update(Number(id), {serialPort, logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection})
-    reply.send(config)
+      const { id } = request.params as any
+      const { serialPort, logLevel, description, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection, queue, item, uid } = request.body as Partial<ConfigGateway>
+      const config = await Gateway.update(Number(id), { serialPort, description, logLevel, integration, apiKey, clientApiUrl, readQueueInterval, wsConnection, queue, item, uid })
+      reply.send(config)
     } catch (error: any) {
       reply.log.error(error)
-      reply.status(500).send({error: error?.message})
+      reply.status(500).send({ error: error?.message })
     }
-    
+
   })
 }
 

@@ -5,8 +5,8 @@ import { prisma } from "../prisma";
 export async function getToken(fastify: FastifyInstance, request: FastifyRequest, reply: FastifyReply) {
   const { username, password } = request.body as { username: string, password: string }
   const user = await prisma.user.findFirst({
-    where:{
-      username:{
+    where: {
+      username: {
         equals: username
       }
     }
